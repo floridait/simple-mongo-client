@@ -22,7 +22,7 @@ end
 First set the mongo url for the session. Using FISH Shell it would look like this.
 
 ```
-set -x MONGO_URL "mongodb://testuser:testpass@localhost:27017/somedb?ssl=true&authSource=somedb"
+set -x SIMPLE_MONGO_CLIENT_URL "mongodb://testuser:testpass@localhost:27017/somedb?ssl=true&authSource=somedb"
 ```
 
 To show a list of available databases in that url do the following.
