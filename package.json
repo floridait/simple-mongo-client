@@ -1,12 +1,16 @@
 {
   "name": "simple-mongo-client",
-  "version": "0.0.1",
-  "description": "Query mongo without needing to install MongoDB",
+  "version": "1.0.0",
+  "description": "Simple mongo client for the command line. Build to be quick for development",
   "main": "mongo.js",
   "author": "Andre Honsberg <floridait@gmail.com>",
   "license": "MIT",
   "dependencies": {
     "inquirer": "^4.0.0",
     "mongodb": "^2.2.33"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/floridait/simple-mongo-client.git"
   }
 }
