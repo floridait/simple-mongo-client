@@ -1,0 +1,12 @@
+{
+  "name": "simple-mongo-client",
+  "version": "0.0.1",
+  "description": "Query mongo without needing to install MongoDB",
+  "main": "mongo.js",
+  "author": "Andre Honsberg <floridait@gmail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "inquirer": "^4.0.0",
+    "mongodb": "^2.2.33"
+  }
+}
