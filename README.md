@@ -3,7 +3,8 @@
 ## Install
 
 ```
-cd ~/Programming/dev-tools/simple-mongo-client
+git clone git@github.com:floridait/simple-mongo-client.git
+cd simple-mongo-client
 yarn
 ```
 
@@ -11,8 +12,8 @@ I use FISH so here is the fish way. You can make an alias in bash or whatever...
 
 ```
 function mongo --description="simple-mongo-client"
-  set -gx SIMPLE_MONGO_CLIENT_URL "mongodb://test:test@localhost:3001/chhub?ssl=true&authSource=chhub"
-  node ~/Programming/dev-tools/simple-mongo-client/mongo.js $argv;
+  set -gx SIMPLE_MONGO_CLIENT_URL "mongodb://testuser:testpass@localhost:27017/somedb?ssl=true&authSource=somedb"
+  node ~/Programming/simple-mongo-client/mongo.js $argv;
 end
 ```
 
@@ -21,7 +22,7 @@ end
 First set the mongo url for the session. Using FISH Shell it would look like this.
 
 ```
-set -x MONGO_URL "mongodb://test:test@localhost:3001/chhub?ssl=true&authSource=chhub"
+set -x MONGO_URL "mongodb://testuser:testpass@localhost:27017/somedb?ssl=true&authSource=somedb"
 ```
 
 To show a list of available databases in that url do the following.
@@ -33,55 +34,46 @@ node mongo.js
 The output will look like this
 
 ```
-➜ mac ➜ ..Programming/mongo-client node mongo.js
+➜ mac ➜ ..Programming/simple-mongo-client node mongo.js
 node mongo.js <database> [<collection> <[insert|update|find|findOne]> <selector> <[data|options]> [<options>]]
 
 Databases:
 
-db: 24TTest-1487328219475 size: 1200128 empty: false
+db: somedb size: 1200128 empty: false
 db: admin size: 81920 empty: false
-db: chhub size: 626688 empty: false
-db: chmarketplace size: 950272 empty: false
+db: anotherdb size: 950272 empty: false
 db: local size: 5468160 empty: false
 ```
 
 One you know which database you want to query you would do the next step to list the possible collections.
 
 ```
-node mongo.js 24TTest-1487328219475
+node mongo.js somedb
 ```
 
 Now you would see output like this
 
 ```
-➜ mac ➜ ..Programming/mongo-client node mongo.js 24TTest-1487328219475
+➜ mac ➜ ..Programming/simple-mongo-client node mongo.js somedb
 Collections:
 
-translationTasks
-documentConversionJobs
 fs.files
-analysis
 fs.chunks
-quoteEnquiries
-quotes
-vendorConnectors
-documentConversions
-lspVendors
-orderProgress
-projects
-translationDeliveries
+collection1
+collection2
+collection3
 ```
 
 Are you starting to notice the pattern? Now to see all the documents in the collection do the following:
 
 ```
-node mongo.js 24TTest-1487328219475 fs.files
+node mongo.js somedb fs.files
 ```
 
 And once again your output for the above command:
 
 ```
-➜ mac ➜ ..Programming/mongo-client node mongo.js 24TTest-1487328219475 fs.files
+➜ mac ➜ ..Programming/simple-mongo-client node mongo.js somedb fs.files
 [ { _id: 5a096103c58e5447a7f03892,
     length: 8826,
     chunkSize: 261120,
@@ -147,13 +139,13 @@ And once again your output for the above command:
 Now you habe multiple options. You can use the commands find, findOne, update, and remove. For `find` you need to specify also a query and optional options like so:
 
 ```
-node mongo.js 24TTest-1487328219475 fs.files find '{"_id":ObjectId("5a096103c58e5447a7f03892")}'
+node mongo.js somedb fs.files find '{"_id":ObjectId("5a096103c58e5447a7f03892")}'
 ```
 
 The above command will give an output like:
 
 ```
-➜ mac ➜ ..Programming/mongo-client node mongo.js 24TTest-1487328219475 fs.files find '{"_id":ObjectId("5a096103c58e5447a7f03892")}'
+➜ mac ➜ ..Programming/simple-mongo-client node mongo.js somedb fs.files find '{"_id":ObjectId("5a096103c58e5447a7f03892")}'
 [ { _id: 5a096103c58e5447a7f03892,
     length: 8826,
     chunkSize: 261120,
@@ -169,7 +161,7 @@ The above command will give an output like:
 We can also only show certain fields by doing the following:
 
 ```
-node mongo.js 24TTest-1487328219475 fs.files find '{}' '{"fields":{"_id":1}}'
+node mongo.js somedb fs.files find '{}' '{"fields":{"_id":1}}'
 ```
 
 And the output:
@@ -208,7 +200,7 @@ We can now easily drop collections. Below we will drop the collection test1 in 2
 
 
 ```
-node mongo.js chmarketplace test1 drop
+node mongo.js anotherdb test1 drop
 ```
 
 The output of the above command should look like `DROP test1 was dropped successfully`.
@@ -218,22 +210,20 @@ The output of the above command should look like `DROP test1 was dropped success
 We can drop multiple collections at once. We can also use this way to drop single collections. Which way you choose for single collection dropping is up to you.
 
 ```
-node mongo.js chmarketplace drop
+node mongo.js anotherdb drop
 ```
 
 You will get a multi select menu that looks like this:
 
 ```
-➜ mac ➜ ..dev-tools/simple-mongo-client git:(master) ✗ mongo chmarketplace drop
+➜ mac ➜ ..Programming/simple-mongo-client git:(master) ✗ mongo anotherdb drop
 ? Which collections would you like to drop? (Press <space> to select, <a> to toggle all, <i> to invert s
 election)
-❯◯ counters
- ◯ currencies
+❯◯ collection1
+ ◯ collection2
  ◯ fs.chunks
  ◯ fs.files
- ◯ jobs
- ◯ meteor_accounts_loginServiceConfiguration
- ◯ orders
+ ◯ collection3
 (Move up and down to reveal more choices)
 ```
 
@@ -245,13 +235,13 @@ Just like the instructions in the second row show you, you can select one or mor
 For completion of the tool we also have a way of creating empty collections quickly for testing purpose or whatever else.
 
 ```
-node mongo.js chmarketplace createCollection
+node mongo.js anotherdb createCollection
 ```
 
 You will be prompted to enter a collection name.
 
 ```
-➜ mac ➜ ..dev-tools/simple-mongo-client git:(master) ✗ mongo chmarketplace createCollection
+➜ mac ➜ ..Programming/simple-mongo-client git:(master) ✗ mongo anotherdb createCollection
 ? Enter the collection name you want to create:
 ```
 
