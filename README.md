@@ -216,7 +216,7 @@ node mongo.js anotherdb drop
 You will get a multi select menu that looks like this:
 
 ```
-➜ mac ➜ ..Programming/simple-mongo-client git:(master) ✗ mongo anotherdb drop
+➜ mac ➜ ..Programming/simple-mongo-client git:(master) ✗ node mongo.js anotherdb drop
 ? Which collections would you like to drop? (Press <space> to select, <a> to toggle all, <i> to invert s
 election)
 ❯◯ collection1
@@ -241,7 +241,7 @@ node mongo.js anotherdb createCollection
 You will be prompted to enter a collection name.
 
 ```
-➜ mac ➜ ..Programming/simple-mongo-client git:(master) ✗ mongo anotherdb createCollection
+➜ mac ➜ ..Programming/simple-mongo-client git:(master) ✗ node mongo.js anotherdb createCollection
 ? Enter the collection name you want to create:
 ```
 
