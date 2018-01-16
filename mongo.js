@@ -1,8 +1,12 @@
 const mongodb = require('mongodb');
 const util = require('util');
 const inquirer = require('inquirer');
+const alphaSortCollectionNames = require('./lib/sorting.js').alphaSortCollectionNames;
 const dropCollection = require('./lib/dropCollection.js').dropCollection;
 const createCollection = require('./lib/createCollection.js').createCollection;
+const listCollections = require('./lib/listCollections.js').listCollections;
+const listDatabases = require('./lib/listDatabases.js').listDatabases;
+const listCollectionData = require('./lib/listCollectionData.js').listCollectionData;
 
 const MongoClient = mongodb.MongoClient;
 const ObjectID = mongodb.ObjectID;
@@ -11,11 +15,6 @@ let mainDb = null;
 let childDb = null;
 
 function noRes(query) { console.log('QUERY no results:', util.inspect(query, false, 4, true)); }
-function alphaSortCollectionNames(a, b) {
-  if (a.s.name < b.s.name) return -1;
-  if (a.s.name > b.s.name) return 1;
-  return 0;
-}
 
 async function main() {
   const url = process.env.SIMPLE_MONGO_CLIENT_URL || null;
@@ -33,51 +32,35 @@ async function main() {
     );
   }
 
-  mainDb = await MongoClient
-    .connect(url, {
-      reconnectTries: 20,
-      reconnectInterval: 1000,
-      keepAlive: 1,
-      socketTimeoutMS: 30000,
-    });
-  if (!mainDb) {
-    console.log('ERROR cannot connect to the server:', process.env.MONGO_URL);
+  try {
+    mainDb = await MongoClient
+      .connect(url, {
+        reconnectTries: 20,
+        reconnectInterval: 1000,
+        keepAlive: 1,
+        socketTimeoutMS: 30000,
+      });
+    if (!mainDb) {
+      console.log('ERROR cannot connect to the server:', process.env.SIMPLE_MONGO_CLIENT_URL);
+      process.exit(1);
+    }
+  } catch (_e) {
+    console.log('ERROR a connection to the server could not be established');
     process.exit(1);
   }
 
   if (argus.length < 3) {
-    const databases = await mainDb.admin().listDatabases();
-    if (databases && databases.databases && databases.databases.length) {
-      console.log('Databases:\n');
-      const dbs = databases.databases;
-      for (let i = 0; i < dbs.length; i++) {
-        console.log(`db: ${dbs[i].name} size: ${dbs[i].sizeOnDisk} empty: ${dbs[i].empty}`);
-      }
-    }
+    await listDatabases();
   }
 
   if (argus.length === 3) {
-    childDb = await mainDb.db(argus[2]);
-    const collections = await childDb.collections();
-    if (collections && collections.length) {
-      console.log('Collections:\n');
-      collections.sort(alphaSortCollectionNames);
-      for (let i = 0; i < collections.length; i++) {
-        const col = collections[i].s.name;
-        console.log(col);
-      }
-    }
+    await listCollections(argus[2]);
   }
 
   if (argus.length === 4 &&
     argus[3] !== 'drop' &&
     argus[3] !== 'createCollection') {
-    childDb = await mainDb.db(argus[2]);
-    const col = await childDb.collection(argus[3]);
-    const data = await col.find({}).toArray();
-    if (data && data.length) {
-      console.log(util.inspect(data, false, 4, true));
-    }
+    await listCollectionData(argus[2], argus[3]);
   }
 
   if (argus.length === 4 && argus[3] === 'drop') {
