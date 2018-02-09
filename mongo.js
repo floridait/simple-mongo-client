@@ -1,12 +1,14 @@
 const mongodb = require('mongodb');
 const util = require('util');
 const inquirer = require('inquirer');
+const runUsage = require('./lib/usage.js').runUsage;
 const alphaSortCollectionNames = require('./lib/sorting.js').alphaSortCollectionNames;
 const dropCollection = require('./lib/dropCollection.js').dropCollection;
 const createCollection = require('./lib/createCollection.js').createCollection;
 const listCollections = require('./lib/listCollections.js').listCollections;
 const listDatabases = require('./lib/listDatabases.js').listDatabases;
 const listCollectionData = require('./lib/listCollectionData.js').listCollectionData;
+const downloadFile = require('./lib/downloadFile.js').downloadFile;
 
 const MongoClient = mongodb.MongoClient;
 const ObjectID = mongodb.ObjectID;
@@ -26,10 +28,7 @@ async function main() {
 
   const argus = process.argv;
   if (argus.length < 3) {
-    console.log(
-      'node mongo.js <database> [<drop> | [<collection> <[insert|update|find|findOne|drop]>' +
-      ' <selector> <[data|options]> [<options>]]]\n'
-    );
+    runUsage();
   }
 
   try {
@@ -53,14 +52,35 @@ async function main() {
     await listDatabases();
   }
 
-  if (argus.length === 3) {
+  if (argus.length === 3 &&
+    argus[2] !== 'url') {
     await listCollections(argus[2]);
+  }
+
+  if (argus.length === 3 &&
+    argus[2] === 'url') {
+    console.log(
+      'SIMPLE_MONGO_CLIENT_URL:',
+      process.env.SIMPLE_MONGO_CLIENT_URL || 'NOT SET!'
+    );
+    if (typeof argus[3] !== 'undefined') {
+      process.env.SIMPLE_MONGO_CLIENT_URL = argus[3];
+      console.log(
+        'New set SIMPLE_MONGO_CLIENT_URL:',
+        process.env.SIMPLE_MONGO_CLIENT_URL || 'NOT SET!'
+      );
+    }
   }
 
   if (argus.length === 4 &&
     argus[3] !== 'drop' &&
-    argus[3] !== 'createCollection') {
+    argus[3] !== 'createCollection' &&
+    argus[3] !== 'downloadFile') {
     await listCollectionData(argus[2], argus[3]);
+  }
+
+  if (argus.length === 4 && argus[3] === 'downloadFile') {
+    await downloadFile(argus[2]);
   }
 
   if (argus.length === 4 && argus[3] === 'drop') {

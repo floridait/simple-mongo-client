@@ -10,9 +10,24 @@ yarn
 
 I use FISH so here is the fish way. You can make an alias in bash or whatever...
 
+> If you only use one mongodb use the function below:
+
 ```
 function mongo --description="simple-mongo-client"
   set -gx SIMPLE_MONGO_CLIENT_URL "mongodb://testuser:testpass@localhost:27017/somedb?ssl=true&authSource=somedb"
+  node ~/Programming/simple-mongo-client/mongo.js $argv;
+end
+```
+
+> If you want to be able to overwrite the mongodb connection string use this function:
+
+```
+function mongo --description="simple-mongo-client"
+  if begin; test -z $SIMPLE_MONGO_CLIENT_URL; end
+    set -gx SIMPLE_MONGO_CLIENT_URL "mongodb://test:test@localhost:3001/chhub?ssl=true&authSource=chhub";
+  else
+    echo "Using: $SIMPLE_MONGO_CLIENT_URL";
+  end
   node ~/Programming/simple-mongo-client/mongo.js $argv;
 end
 ```
